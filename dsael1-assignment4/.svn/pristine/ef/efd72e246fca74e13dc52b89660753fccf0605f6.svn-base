@@ -1,0 +1,41 @@
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+/**
+ * 
+ * @author David Saelee
+ * @version
+ *
+ */
+public class WordCountMain {
+    /**
+     * 
+     * @param theArgs
+     * @throws FileNotFoundException
+     */
+    public static void main(final String[] theArgs) throws FileNotFoundException {
+
+        intro();
+
+    }
+
+    /**
+     * 
+     * @throws FileNotFoundException
+     */
+    public static void intro() throws FileNotFoundException {
+
+        final Scanner input = new Scanner(System.in);
+
+        System.out.println("This program will analyze any text file book and output "
+                           + "a list of the top repeated words.");
+        System.out.println();
+        System.out.println("Please enter the name of the text file followed by the .txt: ");
+        final String textFileName = input.next();
+        System.out.println("Please enter a number to generate the top N list. ");
+        final int number = input.nextInt();
+        new WordCount().run(textFileName, number);
+        input.close();
+
+    }
+}

@@ -1,0 +1,154 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Scanner;
+import java.util.TreeMap;
+
+/**
+ * 
+ * @author David Saelee
+ * @version
+ */
+public class WordCount {
+
+    /**
+     * 
+     */
+    public void run(final String theFileName, final int number) {
+
+        List<String> list = readWords(theFileName);
+        System.out.println("The total number of words in the text file: " + list.size());
+        System.out.println();
+        Map<String, Integer> hash = new HashMap<String, Integer>();
+        long minTimeHash = bestTime(list, hash, number, true);
+        System.out.println();
+        System.out.println("The results for HashMap.");
+        System.out.println("Best time for 10 runs: " + minTimeHash + "ms");
+        System.out.println();
+        System.out.println("The results for TreeMap.");
+        Map<String, Integer> tree = new TreeMap<String, Integer>();
+        long minTimeTree = bestTime(list, tree, number, false);
+        System.out.println("Best time for 10 runs: " + minTimeTree + "ms");
+
+    }
+
+    public long bestTime(List<String> theWordList, Map<String, Integer> theMap, int theNumber,
+                         boolean print) {
+
+        long minTime = trial(theWordList, theMap, theNumber, print);
+
+        for (int i = 0; i < 9; i++) {
+
+            theMap.clear();
+            final long trialTime = trial(theWordList, theMap, theNumber, false);
+
+            if (minTime > trialTime) {
+
+                minTime = trialTime;
+            }
+
+        }
+        return minTime;
+
+    }
+
+    public long trial(List<String> theWordList, Map<String, Integer> theMap, int theNumber,
+                      boolean print) {
+
+        final long startTime = System.currentTimeMillis();
+        getCount(theWordList, theMap);
+        getTopN(theNumber, theMap, print);
+        final long endTime = System.currentTimeMillis();
+        final long totalTime = endTime - startTime;
+
+        return totalTime;
+    }
+
+    /**
+     * 
+     * @param theBookName
+     * @return
+     */
+    public List<String> readWords(final String theBookName) {
+
+        final ArrayList<String> listOfWords = new ArrayList<String>();
+
+        try {
+            final Scanner input = new Scanner(new File(theBookName));
+            input.useDelimiter("[^a-zA-Z]+");
+            while (input.hasNext()) {
+                String word = input.next();
+                word = word.toLowerCase();
+                listOfWords.add(word);
+
+            }
+            input.close();
+        }
+        catch (final FileNotFoundException error) {
+            System.out.println(error.getMessage());
+        }
+        return listOfWords;
+    }
+
+    /**
+     * 
+     * @param theFileName
+     * @return
+     */
+    public static void getCount(final List<String> list,
+                                final Map<String, Integer> numberOfAppearances) {
+
+        for (String word : list) {
+
+            if (!numberOfAppearances.containsKey(word)) {
+
+                numberOfAppearances.put(word, 0);
+            }
+            final int count = numberOfAppearances.get(word);
+            numberOfAppearances.put(word, count + 1);
+
+        }
+    }
+
+    /**
+     * 
+     * @param number
+     * @param allWords
+     * @param print
+     */
+    public void getTopN(int number, Map<String, Integer> allWords, boolean print) {
+
+        PriorityQueue<String> list =
+                        new PriorityQueue<String>(number, new Comparator<String>() {
+
+                            public int compare(String n1, String n2) {
+
+                                return allWords.get(n2) - allWords.get(n1);
+
+                            }
+                        });
+
+        for (String s : allWords.keySet()) {
+
+            list.add(s);
+
+        }
+        if (print) {
+
+            for (int i = 0; i < number; i++) {
+
+                String word = list.remove();
+
+                System.out.println(word + ", " + allWords.get(word));
+
+            }
+        }
+
+    }
+
+}
